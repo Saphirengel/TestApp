@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="simple_items">
+        <item>"Zwerg"</item>
+        <item>"Zentaur"</item>
+        <item>"Gobo"</item>
+    </array>
+</resources>
