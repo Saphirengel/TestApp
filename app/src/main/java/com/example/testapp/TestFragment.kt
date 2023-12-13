@@ -8,6 +8,9 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.core.view.isEmpty
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModel
@@ -15,6 +18,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.testapp.apiundco.Unterrasse
 import com.example.testapp.databinding.TestScreenBinding
 import com.example.testapp.viewmodel.TestViewModel
+import okhttp3.internal.notify
+import java.util.Collections
 
 
 class TestFragment(
@@ -24,7 +29,7 @@ class TestFragment(
 
     private lateinit var binding: TestScreenBinding
     val viewModel: TestViewModel by activityViewModels()
-    private  var selectedRace: Unterrasse? = null
+    private  var selectedRace = Unterrasse()
 
 
     override fun onCreateView(
@@ -48,61 +53,13 @@ class TestFragment(
                 spinnerChoice(it)
 
             } catch (e: Exception) {
-                // Fehlerbehandlung für den API-Aufruf
-                Toast.makeText(requireContext(), "Fehler beim Laden der Rassen", Toast.LENGTH_SHORT)
-                    .show()
+              Log.e("TestFragment", "Hier ist ein Funktionsfehler")
             }
         }
-
-        // lesen der daten im spinner(rasse) -> den zusätzlichen wert(strength) -> plus diesem wert
-
-        var werteCounter = binding.tvPunkte.text.toString().toInt()
-        var staerke = binding.tvStaerke.text.toString().toInt()
-        var newStaerke = staerke
-        Log.e("Test", "Werte")
-        if(selectedRace?.strenght != null){
-            Log.e("Test", "rechnen")
-            newStaerke = staerke + (selectedRace!!.strenght).toInt()
-            binding.ibWertePlus.setOnClickListener {
-                if (werteCounter > 0) {
-                    staerke++
-                    werteCounter--
-                    binding.tvStaerke.text = staerke.toString()
-                    binding.tvPunkte.text = werteCounter.toString()
-                } else {
-                }
-
-            }
-            binding.ibWerteMinus.setOnClickListener {
-                if (staerke > 0) {
-                    staerke--
-                    werteCounter++
-                    binding.tvStaerke.text = staerke.toString()
-                    binding.tvPunkte.text = werteCounter.toString()
-                } else {
-                }
-            }
-        }
-        binding.tvStaerke.text = newStaerke.toString()
-
-
-
-
-        val geschick = binding.tvGeschick.text.toString().toInt()
-
-
-
-
-
-
         binding.btAntwort.setOnClickListener {
             findNavController().navigate(R.id.bewegungsFragment)
         }
     }
-
-
-
-
     private fun setupSpinner(dataList: List<Unterrasse>) {
         Log.e("Test", "Wahl")
         val raceList = dataList.map { it.raceName }
@@ -113,8 +70,6 @@ class TestFragment(
             raceList
         )
         spinner.adapter = adapter
-
-
     }
     fun spinnerChoice(dataList: List<Unterrasse>){
         Log.e("Test", "hören")
@@ -124,12 +79,48 @@ class TestFragment(
                 view: View,
                 position: Int,
                 id: Long
-            ) { selectedRace = dataList[position]}
+            ) {
+                var emptyRace = Unterrasse(id = 0, raceName = "Wähle eine Rasse")
+                var newList = dataList.toMutableList()
+                newList.add(0,emptyRace)
+                var arrytest = newList.toTypedArray()
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {
-                selectedRace = dataList.first()
+                selectedRace = arrytest[position]
+
+                var werteCounter = binding.tvPunkte.text.toString().toInt()
+                var staerke = binding.tvStaerke.text.toString().toInt()
+                var newStaerke = staerke + selectedRace.strenght.toInt()
+                binding.tvStaerke.text = newStaerke.toString()
+                binding.ibWertePlus.setOnClickListener {
+                if (newStaerke < 10 && werteCounter > 0) {
+                    newStaerke++
+                    werteCounter--
+                    binding.tvStaerke.text = newStaerke.toString()
+                    binding.tvPunkte.text = werteCounter.toString()
+                } else {
+                }
+
             }
+                binding.ibWerteMinus.setOnClickListener {
+                if (staerke > 1) {
+                    newStaerke--
+                    werteCounter++
+                    binding.tvStaerke.text = newStaerke.toString()
+                    binding.tvPunkte.text = werteCounter.toString()
+                } else {
+                }
+            }
+
         }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+
+                }
+            }
+
+
     }
 }
+
+
 //Peace
