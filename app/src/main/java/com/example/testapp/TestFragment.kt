@@ -7,19 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.core.view.isEmpty
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.findNavController
 import com.example.testapp.apiundco.Unterrasse
 import com.example.testapp.databinding.TestScreenBinding
 import com.example.testapp.viewmodel.TestViewModel
-import okhttp3.internal.notify
-import java.util.Collections
 
 
 class TestFragment(
@@ -29,7 +22,8 @@ class TestFragment(
 
     private lateinit var binding: TestScreenBinding
     val viewModel: TestViewModel by activityViewModels()
-    private  var selectedRace = Unterrasse()
+    private  var selectedRace = Unterrasse(0,"0","0","0","0","0","0","0","0")
+    private var werteCounter = 0
 
 
     override fun onCreateView(
@@ -45,24 +39,75 @@ class TestFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
-
         viewModel.rassen.observe(viewLifecycleOwner) {
             try {
                 setupSpinner(it) // Funktion zum Einrichten des Spinners aufrufen
                 spinnerChoice(it)
-
             } catch (e: Exception) {
               Log.e("TestFragment", "Hier ist ein Funktionsfehler")
             }
         }
+
+
+
+
+
+        viewModel.calculatetStrenght.observe(viewLifecycleOwner){
+            try {
+                binding.tvStaerke.text = it.toString()
+            }catch (e: Exception){}
+        }
+        viewModel.calculatetDextery.observe(viewLifecycleOwner){
+            try {
+                binding.tvGeschick.text = it.toString()
+            }catch (e: Exception){}
+        }
+        viewModel.calculatetInti.observe(viewLifecycleOwner){
+            try {
+                binding.tvIntelligenz.text = it.toString()
+            }catch (e: Exception){}
+        }
+        viewModel.calculatetConsti.observe(viewLifecycleOwner){
+            try {
+                binding.tvKonstitution.text = it.toString()
+            }catch (e: Exception){}
+        }
+        viewModel.calculatetWeisheit.observe(viewLifecycleOwner){
+            try {
+                binding.tvWeisheit.text = it.toString()
+            }catch (e: Exception){}
+        }
+        viewModel.calculatetCharisma.observe(viewLifecycleOwner){
+            try {
+                binding.tvCharisma.text = it.toString()
+            }catch (e: Exception){}
+        }
+        viewModel.calculatetGlueck.observe(viewLifecycleOwner){
+            try {
+                binding.tvGlueck.text = it.toString()
+            }catch (e: Exception){}
+        }
+
+        viewModel.strenght.observe(viewLifecycleOwner){
+            binding.tvBeschreibung.text
+        }
+
+
+
+
+
+
         binding.btAntwort.setOnClickListener {
             findNavController().navigate(R.id.bewegungsFragment)
         }
     }
     private fun setupSpinner(dataList: List<Unterrasse>) {
         Log.e("Test", "Wahl")
-        val raceList = dataList.map { it.raceName }
+        var dummy = Unterrasse(id = 0, raceName = "Wähle eine Rasse","5","5","5","5","5","5","5")
+        var newList = dataList.toMutableList()
+        newList.add(0,dummy)
+        var arryList = newList.toTypedArray()
+        val raceList = arryList.map { it.raceName }
         val spinner = binding.spRasse
         val adapter = ArrayAdapter(
             requireContext(),
@@ -76,51 +121,48 @@ class TestFragment(
         binding.spRasse.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
-                view: View,
+                view: View?,
                 position: Int,
                 id: Long
             ) {
-                var emptyRace = Unterrasse(id = 0, raceName = "Wähle eine Rasse")
+               var dummy = Unterrasse(id = 0, raceName = "Wähle eine Rasse","0","0","0","0","0","0","0")
                 var newList = dataList.toMutableList()
-                newList.add(0,emptyRace)
-                var arrytest = newList.toTypedArray()
+                newList.add(0,dummy)
+                var arryList = newList.toTypedArray()
 
-                selectedRace = arrytest[position]
+                selectedRace = arryList[position]
+                viewModel.valueCalculatet(selectedRace)
+                neueStats()
+                beschreibung(selectedRace)
 
-                var werteCounter = binding.tvPunkte.text.toString().toInt()
-                var staerke = binding.tvStaerke.text.toString().toInt()
-                var newStaerke = staerke + selectedRace.strenght.toInt()
-                binding.tvStaerke.text = newStaerke.toString()
-                binding.ibWertePlus.setOnClickListener {
-                if (newStaerke < 10 && werteCounter > 0) {
-                    newStaerke++
-                    werteCounter--
-                    binding.tvStaerke.text = newStaerke.toString()
-                    binding.tvPunkte.text = werteCounter.toString()
-                } else {
-                }
+
 
             }
-                binding.ibWerteMinus.setOnClickListener {
-                if (staerke > 1) {
-                    newStaerke--
-                    werteCounter++
-                    binding.tvStaerke.text = newStaerke.toString()
-                    binding.tvPunkte.text = werteCounter.toString()
-                } else {
-                }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
-
-        }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                }
-            }
-
-
     }
+    fun neueStats(){
+            try {
+                binding.tvStaerke.text = viewModel.calculatetStrenght.value.toString()
+                binding.tvGeschick.text = viewModel.calculatetDextery.value.toString()
+                binding.tvIntelligenz.text = viewModel.calculatetInti.value.toString()
+                binding.tvKonstitution.text = viewModel.calculatetConsti.value.toString()
+                binding.tvWeisheit.text = viewModel.calculatetWeisheit.value.toString()
+                binding.tvCharisma.text = viewModel.calculatetCharisma.value.toString()
+                binding.tvGlueck.text = viewModel.calculatetGlueck.value.toString()
+            }catch (e: Exception){}
+        }
+    fun beschreibung(selectedRace: Unterrasse){
+        viewModel.werteBeschreibung(selectedRace)
+        binding.tvBeschreibung.text ="""
+            Du bist ${selectedRace.raceName.toString()} ein  der ${viewModel.strenght.value.toString()} ist dein Geschick ist ${viewModel.dextery.value.toString()}. Deine Intelligenz übertrifft ${viewModel.intelligence.value.toString()}.
+            Deine Konstititon entspricht ${viewModel.constituion.value.toString()} und das angesammelte Wissen gleicht ${viewModel.wisdom.value.toString()} . Du
+            hast die Ausstrahlung von ${viewModel.charisma.value.toString()} , aber was dein Glück an geht liegt es bei ${viewModel.luck.value.toString()} .
+        """.trimIndent()
+    }
+
+
+
+
+
 }
-
-
-//Peace

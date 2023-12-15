@@ -4,21 +4,21 @@ import com.squareup.moshi.Json
 
 data class Unterrasse(
 
-    val id: Int = 0,
+    val id: Int ,
     @Json(name = "Rassen")
-    var raceName: String = "",
+    var raceName: String,
     @Json(name = "Stärke")
-    var strenght: String = "5",
+    var strenght: String ,
     @Json(name = "Geschicklichkeit")
-    val dexteriey : String = "5",
+    val dexteriey : String,
     @Json(name = "Intelligenz")
-    val intelligence : String = "5",
+    val intelligence : String ,
     @Json(name = "Konstitution")
-    val constituion : String = "5",
+    val constituion : String ,
     @Json(name = "Weisheit")
-    val wisdom : String = "5",
+    val wisdom : String,
     @Json(name = "Charisma")
-    val charisma : String = "5",
+    val charisma : String,
     @Json(name = "Glück")
-    val luck : String = "5"
+    val luck : String
 )
