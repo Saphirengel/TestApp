@@ -23,7 +23,7 @@ class TestFragment(
     private lateinit var binding: TestScreenBinding
     val viewModel: TestViewModel by activityViewModels()
     private  var selectedRace = Unterrasse(0,"0","0","0","0","0","0","0","0")
-    private var werteCounter = 0
+    private var werteCounter = 10
 
 
     override fun onCreateView(
@@ -88,8 +88,28 @@ class TestFragment(
             }catch (e: Exception){}
         }
 
+
+
         viewModel.strenght.observe(viewLifecycleOwner){
             binding.tvBeschreibung.text
+        }
+        binding.tvPunkte.text = werteCounter.toString()
+
+
+
+            binding.ibWertePlus.setOnClickListener {
+                if(werteCounter  > 0){viewModel.wertePlus()
+                werteCounter --
+                binding.tvPunkte.text = werteCounter.toString()
+                }else{}
+            }
+
+        binding.ibWerteMinus.setOnClickListener {
+
+                viewModel.wereMinus()
+                werteCounter ++
+                binding.tvPunkte.text = werteCounter.toString()
+
         }
 
 
@@ -130,10 +150,27 @@ class TestFragment(
                 newList.add(0,dummy)
                 var arryList = newList.toTypedArray()
 
+                if (position == 0) {
+                    // Beschreibungstext ausblenden und "Wähle eine Rasse" anzeigen
+                    binding.tvBeschreibung.visibility = View.INVISIBLE
+                    binding.ibWertePlus.visibility = View.INVISIBLE
+                    binding.ibWerteMinus.visibility = View.INVISIBLE
+                    binding.btAntwort.visibility = View.INVISIBLE
+
+                } else {
+                    // Beschreibungstext ausblenden und "Wähle eine Rasse" anzeigen
+                    binding.tvBeschreibung.visibility = View.VISIBLE
+                    binding.ibWertePlus.visibility = View.VISIBLE
+                    binding.ibWerteMinus.visibility = View.VISIBLE
+                    binding.btAntwort.visibility = View.VISIBLE
+                }
+
                 selectedRace = arryList[position]
                 viewModel.valueCalculatet(selectedRace)
                 neueStats()
                 beschreibung(selectedRace)
+                werteCounter = 10
+                binding.tvPunkte.text = werteCounter.toString()
 
 
 
@@ -160,9 +197,4 @@ class TestFragment(
             hast die Ausstrahlung von ${viewModel.charisma.value.toString()} , aber was dein Glück an geht liegt es bei ${viewModel.luck.value.toString()} .
         """.trimIndent()
     }
-
-
-
-
-
 }

@@ -73,6 +73,10 @@ class TestViewModel(application: Application): AndroidViewModel(application) {
     val luck: LiveData<String>
         get() = _luck
 
+    private var _endStaerke = MutableLiveData<Int>()
+    val endstaerke: LiveData<Int>
+        get() = _endStaerke
+
 
 //------------------------------------------alle funs
     fun getRasse(){
@@ -96,13 +100,7 @@ class TestViewModel(application: Application): AndroidViewModel(application) {
 
     fun werteBeschreibung(selectedRace: Unterrasse){
 
-        var staerke = selectedRace.strenght.toInt()
-        var geschick = selectedRace.dexteriey
-        var inti = selectedRace.intelligence
-        var consti = selectedRace.constituion
-        var weisheit = selectedRace.wisdom
-        var charisma = selectedRace.charisma
-        var glueck = selectedRace.luck
+
 
 // API Werte -> String -> Int -> String
         _strenght.value = when {
@@ -202,6 +200,24 @@ class TestViewModel(application: Application): AndroidViewModel(application) {
             _calculatetGlueck.value!! == 5 ->{"du solltest kein Glücksspiel wagen"}
             _calculatetGlueck.value!! <= 3 ->{"reden wir nciht drüber"}
             else -> {"Nichts"}
+        }
+    }
+
+    fun wertePlus(){
+        viewModelScope.launch {
+            var anfangsStaerke = _calculatetStrenght.value ?: 0
+            var werteErhoehung = 1
+            _calculatetStrenght.value = anfangsStaerke + werteErhoehung
+            _endStaerke = _calculatetStrenght
+        }
+    }
+
+    fun  wereMinus(){
+        viewModelScope.launch {
+            var anfangsStaerke = _calculatetStrenght.value ?: 0
+            var werteMinderung = 1
+            _calculatetStrenght.value = anfangsStaerke - werteMinderung
+            _endStaerke = _calculatetStrenght
         }
     }
 }
